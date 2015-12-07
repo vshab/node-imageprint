@@ -1,0 +1,10 @@
+{
+  "name": "node-imageprint",
+  "version": "0.1.0",
+  "description": "Image printing node module",
+  "author": "Vladislav Shabanov <vshabanov88@gmail.com>",
+  "dependencies": {
+    "nan": "~2.1.0"
+  },
+  "main": "./build/Release/imageprinter"
+}
