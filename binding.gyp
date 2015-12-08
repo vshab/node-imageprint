@@ -21,6 +21,16 @@
             ],
             [
                 'OS=="mac"', {
+                    "xcode_settings": {
+                        "MACOSX_DEPLOYMENT_TARGET": "10.10",
+                        "OTHER_CPLUSPLUSFLAGS": [
+                            "-std=c++14",
+                            "-stdlib=libc++"
+                        ],
+                        "OTHER_LDFLAGS": [
+                            "-stdlib=libc++"
+                        ]
+                    }
                 }
             ],
             [
