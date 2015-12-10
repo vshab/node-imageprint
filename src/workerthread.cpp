@@ -58,8 +58,8 @@ void WorkerThread::stop(std::function<void ()>&& result)
     });
 
     isStop = true;
-
     signal.notify_one();
+    thread.join();
 }
 
 void WorkerThread::process()
