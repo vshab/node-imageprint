@@ -34,9 +34,10 @@ public:
 private:
 
     // Get image size and resolution
-    bool getImageSize(CComPtr<IStream> imageStream,
+    bool processImage(CComPtr<IStream> inputImageStream,
                       std::pair<unsigned int, unsigned int>& size,
-                      std::pair<double, double>& resolution);
+                      std::pair<double, double>& resolution,
+					  CComPtr<IStream>& outputImageStream);
 
     // Create rectangle rect path
     CComPtr<IXpsOMPath> createRectanglePath(const XPSRect* rect);
