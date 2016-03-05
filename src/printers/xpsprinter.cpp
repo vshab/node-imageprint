@@ -366,14 +366,6 @@ void XPSPrinter::print(const char* data, size_t length)
         return;
     }
 
-    // @@
-    package->WriteToFile(L"package.xps",
-                 NULL,
-                 FILE_ATTRIBUTE_NORMAL,
-                 FALSE);
-
-                 return;
-
     // Start printing job
     CComPtr<IXpsPrintJob> job;
     CComPtr<IXpsPrintJobStream> jobStream;
