@@ -41,9 +41,9 @@ XPSPrinter::~XPSPrinter()
 bool XPSPrinter::processImage(CComPtr<IStream> inputImageStream,
                               std::pair<unsigned int, unsigned int>& size,
                               std::pair<double, double>& resolution,
-							  CComPtr<IStream>& outputImageStream)
+                              CComPtr<IStream>& outputImageStream)
 {
-	// Decode
+    // Decode input image
     CComPtr<IWICBitmapDecoder> decoder;
     if (FAILED(wicFactory->CreateDecoderFromStream(inputImageStream,
                                                    NULL,
@@ -64,68 +64,65 @@ bool XPSPrinter::processImage(CComPtr<IStream> inputImageStream,
         return false;
     }
 
-	WICPixelFormatGUID pixelFormat = { 0 };
-	if (FAILED(frameDecode->GetPixelFormat(&pixelFormat)))
-	{
-		return false;
-	}
-	
-	// Encode
-	CComPtr<IWICBitmapEncoder> encoder;
-	if (FAILED(wicFactory->CreateEncoder(GUID_ContainerFormatPng, NULL, &encoder)))
-	{
-		return false;
-	}
-	
-	if (FAILED(CreateStreamOnHGlobal(NULL, TRUE, &outputImageStream)))
-	{
-		return false;
-	}
-	
-	if (FAILED(encoder->Initialize(outputImageStream, WICBitmapEncoderNoCache)))
-	{
-		return false;
-	}
-	
-	CComPtr<IWICBitmapFrameEncode> frameEncode;
-	if (FAILED(encoder->CreateNewFrame(&frameEncode, NULL)))
-	{
-		return false;
-	}
+    WICPixelFormatGUID pixelFormat = { 0 };
+    if (FAILED(frameDecode->GetPixelFormat(&pixelFormat)))
+    {
+        return false;
+    }
 
-	if (FAILED(frameEncode->Initialize(NULL)))
-	{
-		return false;
-	}
-	
-	if (FAILED(frameEncode->SetSize(size.first, size.second)))
-	{
-		return false;
-	}
-	
-	// @@
-	resolution.first = resolution.second = 96;
-	if (FAILED(frameEncode->SetResolution(resolution.first, resolution.second)))
-	{
-		return false;
-	}
-	
-	if (FAILED(frameEncode->SetPixelFormat(&pixelFormat)))
-	{
-		return false;
-	}
-	
-	if (FAILED(frameEncode->WriteSource(static_cast<IWICBitmapSource*>(frameDecode), NULL)))
-	{
-		return false;
-	}
-	
-	// Commit
-	frameEncode->Commit();
-	
-	encoder->Commit();
-	
-	outputImageStream->Commit(STGC_DEFAULT);
+    // Encode outptu image
+    CComPtr<IWICBitmapEncoder> encoder;
+    if (FAILED(wicFactory->CreateEncoder(GUID_ContainerFormatPng, NULL, &encoder)))
+    {
+        return false;
+    }
+
+    if (FAILED(CreateStreamOnHGlobal(NULL, TRUE, &outputImageStream)))
+    {
+        return false;
+    }
+
+    if (FAILED(encoder->Initialize(outputImageStream, WICBitmapEncoderNoCache)))
+    {
+        return false;
+    }
+
+    CComPtr<IWICBitmapFrameEncode> frameEncode;
+    if (FAILED(encoder->CreateNewFrame(&frameEncode, NULL)))
+    {
+        return false;
+    }
+
+    if (FAILED(frameEncode->Initialize(NULL)))
+    {
+        return false;
+    }
+
+    if (FAILED(frameEncode->SetSize(size.first, size.second)))
+    {
+        return false;
+    }
+
+    // Set 96 DPI to improve XPS print quality
+    resolution.first = resolution.second = 96;
+    if (FAILED(frameEncode->SetResolution(resolution.first, resolution.second)))
+    {
+        return false;
+    }
+
+    if (FAILED(frameEncode->SetPixelFormat(&pixelFormat)))
+    {
+        return false;
+    }
+
+    if (FAILED(frameEncode->WriteSource(static_cast<IWICBitmapSource*>(frameDecode), NULL)))
+    {
+        return false;
+    }
+
+    frameEncode->Commit();
+    encoder->Commit();
+    outputImageStream->Commit(STGC_DEFAULT);
 
     return true;
 }
@@ -250,17 +247,17 @@ CComPtr<IXpsOMPackage> XPSPrinter::buildPackage(CComPtr<IStream> imageStream)
     {
         return NULL;
     }
-	
-	std::pair<unsigned int, unsigned int> size;
+
+    std::pair<unsigned int, unsigned int> size;
     std::pair<double, double> resolution;
-	CComPtr<IStream> stream;
-    if (!processImage(imageStream, size, resolution, stream))
+    CComPtr<IStream> processedImageStream;
+    if (!processImage(imageStream, size, resolution, processedImageStream))
     {
         return NULL;
     }
 
     CComPtr<IXpsOMImageResource> imageResource;
-    if (FAILED(xpsFactory->CreateImageResource(stream, XPS_IMAGE_TYPE_PNG, opcPartUri, &imageResource)))
+    if (FAILED(xpsFactory->CreateImageResource(processedImageStream, XPS_IMAGE_TYPE_PNG, opcPartUri, &imageResource)))
     {
         return NULL;
     }
@@ -368,14 +365,14 @@ void XPSPrinter::print(const char* data, size_t length)
     {
         return;
     }
-	
-	// @@
-	package->WriteToFile(L"package.xps",
-				 NULL,
-				 FILE_ATTRIBUTE_NORMAL,
-				 FALSE);
 
-				 return;
+    // @@
+    package->WriteToFile(L"package.xps",
+                 NULL,
+                 FILE_ATTRIBUTE_NORMAL,
+                 FALSE);
+
+                 return;
 
     // Start printing job
     CComPtr<IXpsPrintJob> job;

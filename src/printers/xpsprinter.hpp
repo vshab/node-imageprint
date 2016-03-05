@@ -37,7 +37,7 @@ private:
     bool processImage(CComPtr<IStream> inputImageStream,
                       std::pair<unsigned int, unsigned int>& size,
                       std::pair<double, double>& resolution,
-					  CComPtr<IStream>& outputImageStream);
+                      CComPtr<IStream>& outputImageStream);
 
     // Create rectangle rect path
     CComPtr<IXpsOMPath> createRectanglePath(const XPSRect* rect);
