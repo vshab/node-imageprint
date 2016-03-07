@@ -243,7 +243,7 @@ CComPtr<IXpsOMPackage> XPSPrinter::buildPackage(CComPtr<IStream> imageStream)
     }
 
     opcPartUri.Release();
-    if (FAILED(xpsFactory->CreatePartUri(L"/Image.fimg", &opcPartUri)))
+    if (FAILED(xpsFactory->CreatePartUri(L"/Image.png", &opcPartUri)))
     {
         return NULL;
     }
