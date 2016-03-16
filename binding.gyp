@@ -36,7 +36,8 @@
             [
                 'OS=="win"', {
                     "sources": [
-                        "src/printers/xpsprinter.cpp",
+                        "src/printers/xps/printticket.cpp",
+                        "src/printers/xps/xpsprinter.cpp"
                     ]
                 }
             ],
