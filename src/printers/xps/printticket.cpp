@@ -1,27 +1,31 @@
+#include <atlbase.h>
+#include <msxml6.h>
+
+#include <type_traits>
+
 #include "printticket.hpp"
 
 using namespace PrintSchema;
 
-template<typename Value>
-bool addAttribute(IXMLDOMDocument* domDocument, IXMLDOMNode* node, wchar_t* attribute, Value value)
+const wchar_t* psfNamespace = L"http://schemas.microsoft.com/windows/2003/08/printing/printschemaframework";
+
+bool addAttribute(IXMLDOMDocument* domDocument, IXMLDOMNode* node, const wchar_t* attribute, const wchar_t* value)
 {
     CComPtr<IXMLDOMNamedNodeMap> attributesMap;
     node->get_attributes(&attributesMap);
 
     CComPtr<IXMLDOMNode> attributeNode;
     domDocument->createNode(CComVariant(NODE_ATTRIBUTE), CComBSTR(attribute), CComBSTR(L""), &attributeNode);
-
-    std::wstring stringValue = std::to_wstring(value);
-    attributeNode->put_nodeValue(CComVariant(stringValue.c_str()));
+    attributeNode->put_nodeValue(CComVariant(value));
 
     attributesMap->setNamedItem(attributeNode, NULL);
 
     return true;
 }
 
-bool createPSFElement(IXMLDOMDocument* domDocument, wchar_t* tagName, wchar_t* name, CComPtr<IXMLDOMNode>& node)
+bool createPSFElement(IXMLDOMDocument* domDocument, const wchar_t* tagName, const wchar_t* name, CComPtr<IXMLDOMNode>& node)
 {
-    domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(tagName), psfNamespace, &node);
+    domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(tagName), CComBSTR(psfNamespace), &node);
     addAttribute(domDocument, node, L"name", name);
 
     return true;
@@ -29,7 +33,7 @@ bool createPSFElement(IXMLDOMDocument* domDocument, wchar_t* tagName, wchar_t* n
 
 bool createPSFValueElement(IXMLDOMDocument* domDocument, unsigned int value, CComPtr<IXMLDOMNode>& node)
 {
-    domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(L"psf:Value"), psfNamespace, &node);
+    domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(L"psf:Value"), CComBSTR(psfNamespace), &node);
 
     std::wstring stringValue = std::to_wstring(value);
     CComBSTR BSTRValue(stringValue.c_str());
@@ -63,17 +67,17 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
 
     // Create PrintTicket root node
     CComPtr<IXMLDOMNode> printTicketNode;
-    domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(L"psf:PrintTicket"), psfNamespace, &printTicketNode);
+    domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(L"psf:PrintTicket"), CComBSTR(psfNamespace), &printTicketNode);
 
     // Add namespaces
     addAttribute(domDocument, printTicketNode, L"xmlns:xsi", L"http://www.w3.org/2001/XMLSchema-instance");
     addAttribute(domDocument, printTicketNode, L"xmlns:xsd", L"http://www.w3.org/2001/XMLSchema");
     addAttribute(domDocument, printTicketNode, L"xmlns:psk", L"http://schemas.microsoft.com/windows/2003/08/printing/printschemakeywords");
+    
+    std::wstring stringVersion = std::to_wstring(context.version);
+    addAttribute(domDocument, printTicketNode, L"version", stringVersion.c_str());
 
-    /*
     addAttribute(domDocument, printTicketNode, L"xmlns:ns0000", L"http://schemas.microsoft.com/windows/printing/oemdriverpt/MITSUBISHI_CP_K60DW_S_1_0_0_0_");
-    addAttribute(domDocument, printTicketNode, L"version", L"1");
-    */
 
     // Create PageMediaSize
     CComPtr<IXMLDOMNode> pageMediaSizeFeatureNode;
@@ -86,7 +90,7 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
     CComPtr<IXMLDOMNode> optionNode;
     {
         CComPtr<IXMLDOMNode> node;
-        createPSFElement(domDocument, L"psf:Option", L"ns0000:User0000000505", node);
+        createPSFElement(domDocument, L"psf:Option", pageMediaSize.name.c_str(), node);
         pageMediaSizeFeatureNode->appendChild(node, &optionNode);
     }
 
@@ -99,7 +103,7 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
 
     {
         CComPtr<IXMLDOMNode> value;
-        createPSFValueElement(domDocument, printTicket.mediaSize.height, value);
+        createPSFValueElement(domDocument, pageMediaSize.height, value);
         mediaSizeHeightNode->appendChild(value, NULL);
     }
 
@@ -112,7 +116,7 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
 
     {
         CComPtr<IXMLDOMNode> value;
-        createPSFValueElement(domDocument, printTicket.mediaSize.width, value);
+        createPSFValueElement(domDocument, pageMediaSize.width, value);
         mediaSizeWidthNode->appendChild(value, NULL);
     }
 
@@ -132,7 +136,7 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
 
     domDocument->appendChild(printTicketNode, NULL);
 
-    domDocument->save(CComVariant(stream));
+    domDocument->save(CComVariant(printTicketStream));
 
     return true;
 }

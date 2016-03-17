@@ -1,3 +1,6 @@
+#ifndef XPS_PRINT_SCHEMA_HPP
+#define XPS_PRINT_SCHEMA_HPP
+
 #include <string>
 
 namespace PrintSchema
@@ -25,3 +28,5 @@ namespace PrintSchema
         unsigned int width;
     };
 }
+
+#endif

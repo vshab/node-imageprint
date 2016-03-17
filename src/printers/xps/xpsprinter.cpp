@@ -1,4 +1,5 @@
 #include "xpsprinter.hpp"
+#include "printticket.hpp"
 
 #include <cstdlib>
 
@@ -195,7 +196,7 @@ CComPtr<IXpsOMPath> XPSPrinter::createRectanglePath(const XPSRect* rect)
     return rectPath;
 }
 
-CComPtr<IXpsOMPackage> XPSPrinter::buildPackage(CComPtr<IStream> imageStream)
+CComPtr<IXpsOMPackage> XPSPrinter::buildPackage(IStream* imageStream, IStream* printTicketStream)
 {
     CComPtr<IXpsOMPackage> xpsPackage;
     if (FAILED(xpsFactory->CreatePackage(&xpsPackage)))
@@ -349,22 +350,57 @@ CComPtr<IXpsOMPackage> XPSPrinter::buildPackage(CComPtr<IStream> imageStream)
     {
         return NULL;
     }
+    
+    // Add PrintTicket
+    opcPartUri.Release();
+    if (FAILED(xpsFactory->CreatePartUri(L"/PrintTicket.xml", &opcPartUri)))
+    {
+        return NULL;
+    }
+    
+    CComPtr<IXpsOMPrintTicketResource> printTicketResource;
+    if (FAILED(xpsFactory->CreatePrintTicketResource(printTicketStream, opcPartUri, &printTicketResource)))
+    {
+        return NULL;
+    }
+    
+    xpsFDS->SetPrintTicketResource(printTicketResource);
 
     return xpsPackage;
 }
 
 void XPSPrinter::print(const char* data, size_t length)
 {
-    // Create memory stream
-    CComPtr<IStream> stream;
-    stream.Attach(SHCreateMemStream((const BYTE *)data, length));
+    // Write PrintTicket
+    PrintSchema::PageMediaSize pageMediaSize;
+    pageMediaSize.height = 158000;
+    pageMediaSize.width = 105000;
+    pageMediaSize.name = L"ns0000:User0000000501";
+    
+    PrintSchema::PrintCapabilities::Context printCapabilitiesContext;
+    printCapabilitiesContext.namespaces[L"ns0000"] = L"http://schemas.microsoft.com/windows/printing/oemdriverpt/MITSUBISHI_CP_K60DW_S_1_0_0_0_";
+    
+    CComPtr<IStream> printTicketStream;
+    CreateStreamOnHGlobal(NULL, TRUE, &printTicketStream);
+    PrintSchema::PrintTicket::writePrintTicket(pageMediaSize, printCapabilitiesContext, printTicketStream);
+    
+    // Create memory image stream
+    CComPtr<IStream> imageStream;
+    imageStream.Attach(SHCreateMemStream((const BYTE *)data, length));
 
     // Build package
-    CComPtr<IXpsOMPackage> package = buildPackage(stream);
+    CComPtr<IXpsOMPackage> package = buildPackage(imageStream, printTicketStream);
     if (!package)
     {
         return;
     }
+    
+    	    package->WriteToFile(L"package.xps",
+                         NULL,
+                         FILE_ATTRIBUTE_NORMAL,
+                         FALSE);
+
+						 return ;
 
     // Start printing job
     CComPtr<IXpsPrintJob> job;

@@ -1,7 +1,7 @@
 #ifndef XPSPRINTER_HPP
 #define XPSPRINTER_HPP
 
-#include "printer.hpp"
+#include "../printer.hpp"
 
 #include <utility>
 
@@ -43,7 +43,7 @@ private:
     CComPtr<IXpsOMPath> createRectanglePath(const XPSRect* rect);
 
     // Build XPS package with image stretched in document
-    CComPtr<IXpsOMPackage> buildPackage(CComPtr<IStream> imageStream);
+    CComPtr<IXpsOMPackage> buildPackage(IStream* imageStream, IStream* printTicketStream);
 
 private:
 
