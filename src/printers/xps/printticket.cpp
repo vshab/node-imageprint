@@ -27,7 +27,7 @@ void createPSFElement(IXMLDOMDocument* domDocument, const wchar_t* tagName, cons
     ThrowableHResult thr;
 
     thr = domDocument->createNode(CComVariant(NODE_ELEMENT), CComBSTR(tagName), CComBSTR(psfNamespace), &node);
-    addAttribute(domDocument, node, L"name", name))
+    addAttribute(domDocument, node, L"name", name);
 }
 
 void createPSFValueElement(IXMLDOMDocument* domDocument, unsigned int value, CComPtr<IXMLDOMNode>& node)
