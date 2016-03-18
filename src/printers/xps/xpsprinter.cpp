@@ -350,20 +350,20 @@ CComPtr<IXpsOMPackage> XPSPrinter::buildPackage(IStream* imageStream, IStream* p
     {
         return NULL;
     }
-    
+
     // Add PrintTicket
     opcPartUri.Release();
     if (FAILED(xpsFactory->CreatePartUri(L"/PrintTicket.xml", &opcPartUri)))
     {
         return NULL;
     }
-    
+
     CComPtr<IXpsOMPrintTicketResource> printTicketResource;
     if (FAILED(xpsFactory->CreatePrintTicketResource(printTicketStream, opcPartUri, &printTicketResource)))
     {
         return NULL;
     }
-    
+
     xpsFDS->SetPrintTicketResource(printTicketResource);
 
     return xpsPackage;
@@ -376,14 +376,14 @@ void XPSPrinter::print(const char* data, size_t length)
     pageMediaSize.height = 158000;
     pageMediaSize.width = 105000;
     pageMediaSize.name = L"ns0000:User0000000501";
-    
+
     PrintSchema::PrintCapabilities::Context printCapabilitiesContext;
     printCapabilitiesContext.namespaces[L"ns0000"] = L"http://schemas.microsoft.com/windows/printing/oemdriverpt/MITSUBISHI_CP_K60DW_S_1_0_0_0_";
-    
+
     CComPtr<IStream> printTicketStream;
     CreateStreamOnHGlobal(NULL, TRUE, &printTicketStream);
     PrintSchema::PrintTicket::writePrintTicket(pageMediaSize, printCapabilitiesContext, printTicketStream);
-    
+
     // Create memory image stream
     CComPtr<IStream> imageStream;
     imageStream.Attach(SHCreateMemStream((const BYTE *)data, length));
@@ -394,13 +394,6 @@ void XPSPrinter::print(const char* data, size_t length)
     {
         return;
     }
-    
-    	    package->WriteToFile(L"package.xps",
-                         NULL,
-                         FILE_ATTRIBUTE_NORMAL,
-                         FALSE);
-
-						 return ;
 
     // Start printing job
     CComPtr<IXpsPrintJob> job;

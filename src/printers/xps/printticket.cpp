@@ -1,13 +1,15 @@
+#include "printticket.hpp"
+
 #include <atlbase.h>
 #include <msxml6.h>
 
 #include "throwablehresult.hpp"
-#include "printticket.hpp"
 
 using namespace PrintSchema;
 
 const wchar_t* psfNamespace = L"http://schemas.microsoft.com/windows/2003/08/printing/printschemaframework";
 
+// Add attribute to the node
 void addAttribute(IXMLDOMDocument* domDocument, IXMLDOMNode* node, const wchar_t* attribute, const wchar_t* value)
 {
     ThrowableHResult thr;
@@ -22,6 +24,7 @@ void addAttribute(IXMLDOMDocument* domDocument, IXMLDOMNode* node, const wchar_t
     thr = attributesMap->setNamedItem(attributeNode, NULL);
 }
 
+// Create element with specified name
 void createPSFElement(IXMLDOMDocument* domDocument, const wchar_t* tagName, const wchar_t* name, CComPtr<IXMLDOMNode>& node)
 {
     ThrowableHResult thr;
@@ -30,6 +33,7 @@ void createPSFElement(IXMLDOMDocument* domDocument, const wchar_t* tagName, cons
     addAttribute(domDocument, node, L"name", name);
 }
 
+// Create value element
 void createPSFValueElement(IXMLDOMDocument* domDocument, unsigned int value, CComPtr<IXMLDOMNode>& node)
 {
     ThrowableHResult thr;

@@ -5,11 +5,14 @@
 
 #include <winnt.h>
 
+// Syntax sugar to work with HRESULT. Throws exception when assigned FAILED hr.
+// The idea is taken from http://www.codeproject.com/Articles/11679/HRESULT-Error-Check-Simplifier
 class ThrowableHResult
 {
 
 public:
 
+    // Exception class
     class HResultFailed:
         public std::runtime_error
     {
