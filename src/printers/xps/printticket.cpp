@@ -69,7 +69,7 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
 
         // Add Processing Instruction
         CComPtr<IXMLDOMProcessingInstruction> processingInstruction;
-        thr = domDocument->createProcessingInstruction(L"xml", L"version='1.0'", &processingInstruction);
+        thr = domDocument->createProcessingInstruction(L"xml", L"version='1.0' encoding='UTF-8'", &processingInstruction);
         thr = domDocument->appendChild(processingInstruction, NULL);
 
         // Create PrintTicket root node
