@@ -37,8 +37,8 @@
                 'OS=="win"', {
                     "msvs_settings": {
                         "VCCLCompilerTool": {
-                            "AdditionalOptions": [ 
-                                "/EHsc" 
+                            "AdditionalOptions": [
+                                "/EHsc"
                             ]
                         }
                     },
