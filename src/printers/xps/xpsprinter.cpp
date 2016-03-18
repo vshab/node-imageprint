@@ -378,6 +378,7 @@ void XPSPrinter::print(const char* data, size_t length)
     pageMediaSize.name = L"ns0000:User0000000501";
 
     PrintSchema::PrintCapabilities::Context printCapabilitiesContext;
+    printCapabilitiesContext.version = 1;
     printCapabilitiesContext.namespaces[L"ns0000"] = L"http://schemas.microsoft.com/windows/printing/oemdriverpt/MITSUBISHI_CP_K60DW_S_1_0_0_0_";
 
     CComPtr<IStream> printTicketStream;
