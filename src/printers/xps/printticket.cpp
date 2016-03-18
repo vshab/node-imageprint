@@ -80,7 +80,12 @@ bool PrintTicket::writePrintTicket(PageMediaSize const& pageMediaSize,
         std::wstring stringVersion = std::to_wstring(context.version);
         addAttribute(domDocument, printTicketNode, L"version", stringVersion.c_str());
 
-        addAttribute(domDocument, printTicketNode, L"xmlns:ns0000", L"http://schemas.microsoft.com/windows/printing/oemdriverpt/MITSUBISHI_CP_K60DW_S_1_0_0_0_");
+        // Device-specific
+        for (auto const& nameSpace: context.namespaces)
+        {
+            const std::wstring prefixedNameSpace = L"xmlns:" + nameSpace.first;
+            addAttribute(domDocument, printTicketNode, prefixedNameSpace.c_str(), nameSpace.second.c_str());
+        }
 
         // Create PageMediaSize
         CComPtr<IXMLDOMNode> pageMediaSizeFeatureNode;
