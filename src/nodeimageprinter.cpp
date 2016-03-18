@@ -1,7 +1,7 @@
 #include "nodeimageprinter.hpp"
 
 #ifdef _WIN32
-#include "printers/xpsprinter.hpp"
+#include "printers/xps/xpsprinter.hpp"
 typedef XPSPrinter PlatformPrinter;
 #else
 #include "printers/fileprinter.hpp"

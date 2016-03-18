@@ -35,8 +35,16 @@
             ],
             [
                 'OS=="win"', {
+                    "msvs_settings": {
+                        "VCCLCompilerTool": {
+                            "AdditionalOptions": [
+                                "/EHsc"
+                            ]
+                        }
+                    },
                     "sources": [
-                        "src/printers/xpsprinter.cpp",
+                        "src/printers/xps/printticket.cpp",
+                        "src/printers/xps/xpsprinter.cpp"
                     ]
                 }
             ],
