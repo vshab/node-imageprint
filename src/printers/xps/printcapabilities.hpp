@@ -5,6 +5,8 @@
 
 #include "printschema.hpp"
 
+struct IStream;
+
 namespace PrintSchema
 {
 
@@ -22,10 +24,10 @@ namespace PrintCapabilities
 
     bool getPageMediaSizes(IStream* printCapabilitiesStream,
                            std::list<PageMediaSize>& pageMediaSizes);
+    */
 
     bool getPageImageableSize(IStream* printCapabilitiesStream,
                               PageImageableSize& pageImageableSize);
-    */
 }
 
 }
