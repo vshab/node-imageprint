@@ -43,6 +43,7 @@
                         }
                     },
                     "sources": [
+                        "src/printers/xps/printcapabilities.cpp",
                         "src/printers/xps/printticket.cpp",
                         "src/printers/xps/xpsprinter.cpp"
                     ]
