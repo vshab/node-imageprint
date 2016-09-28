@@ -4,7 +4,7 @@
   "description": "Image printing node module",
   "author": "Vladislav Shabanov <vshabanov88@gmail.com>",
   "dependencies": {
-    "nan": "~2.1.0"
+    "nan": "~2.4.0"
   },
   "main": "./build/Release/imageprinter"
 }
